@@ -14,7 +14,7 @@ namespace HMS_NewProject_Temp_Humdity.Database.Interface
 
 		Task<bool> DeleteAsync(string id);
 
-		Task<UserModel?> GetByUserNameAsync(string userName);
+		Task<UserModel?> GetByUserNameAsync(string name);
 
 		Task<UserModel?> GetByUserNameOrPhoneAsync(string input);
 

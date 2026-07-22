@@ -1,7 +1,6 @@
 ﻿using System.Security.Claims;
 using HMS_NewProject_Temp_Humdity.DTO;
 using HMS_NewProject_Temp_Humdity.Services.Interface;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static HMS_NewProject_Temp_Humdity.DTO.AuthDTO;
 namespace HMS_NewProject_Temp_Humdity.Controllers
@@ -42,7 +41,6 @@ namespace HMS_NewProject_Temp_Humdity.Controllers
 		}
 
 		[HttpPost("change-password")]
-		[Authorize]
 		public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
 		{
 			var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

@@ -62,7 +62,18 @@ namespace HMS_NewProject_Temp_Humdity.Database
 
 
 		public async Task<UserModel?> GetByUserNameAsync(string name)
-			=> await _mongo.Find(x => x.Username == name).FirstOrDefaultAsync();
+		{
+			_logger.LogInformation("Bắt đầu tìm user theo PhoneNumber: {PhoneNumber}", name);
+
+			var result = await _mongo.Find(x => x.PhoneNumber == name).FirstOrDefaultAsync();
+
+			if (result == null)
+				_logger.LogWarning("Không tìm thấy user với PhoneNumber: {PhoneNumber}", name);
+			else
+				_logger.LogInformation("Tìm thấy user. UserId: {UserId}, PhoneNumber: {PhoneNumber}", result.UserId, result.PhoneNumber);
+
+			return result;
+		}
 
 		public async Task<UserModel?> GetByUserNameOrPhoneAsync(string input)
 		{

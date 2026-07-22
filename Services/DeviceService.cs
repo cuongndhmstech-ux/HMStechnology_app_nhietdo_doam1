@@ -191,5 +191,8 @@ namespace HMS_NewProject_Temp_Humdity.Services
 
 		//	return await _dAODevice.GetDeviceStatusAsync(Companyid.Value, logs);
 		//}
+
+
+
 	}
 }
