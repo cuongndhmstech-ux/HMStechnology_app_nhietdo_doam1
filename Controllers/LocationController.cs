@@ -51,7 +51,7 @@ namespace HMS_NewProject_Temp_Humdity.Controllers
 			{
 				//case UserActionType.Create:
 				//	{
-				//		var dto = JsonSerializer.Deserialize<LocationModel>(
+				//		var dto = JsonSerializer.Deserialize<CompanyModel>(
 				//			request.Info,
 				//			new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 				//		if (dto == null)

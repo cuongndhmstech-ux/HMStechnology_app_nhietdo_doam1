@@ -18,12 +18,15 @@ namespace HMS_NewProject_Temp_Humdity.Services
 		private readonly IConfiguration _config;
 		private readonly ILogger<AuthService> _logger;
 		private readonly IUserService _userService;
-		public AuthService(IDAOUser daoUser, IUserService userService, IConfiguration config, ILogger<AuthService> logger)
+		private readonly IDAOCounter _dAOCounter;
+
+		public AuthService(IDAOUser daoUser, IUserService userService, IConfiguration config, ILogger<AuthService> logger, IDAOCounter dAOCounter)
 		{
 			_dAOUser = daoUser;
 			_config = config;
 			_logger = logger;
 			_userService = userService;
+			_dAOCounter = dAOCounter;
 		}
 
 		public async Task<LoginResponse> LoginAsync(LoginRequest request)
@@ -46,7 +49,7 @@ namespace HMS_NewProject_Temp_Humdity.Services
 				_config.GetValue<int>("Jwt:ExpiresInMinutes"));
 
 
-			return new LoginResponse { AccessToken = token, FullName = user.Fullname, Phone = user.Username, permission = user.Permissions, role = user.Role, RefreshToken = refreshToken };
+			return new LoginResponse { AccessToken = token, FullName = user.Fullname, Phone = user.Username, role = user.Role, RefreshToken = refreshToken };
 		}
 		public async Task<string> RegisterAsync(RegisterRequest request)
 		{
@@ -54,15 +57,15 @@ namespace HMS_NewProject_Temp_Humdity.Services
 			{
 				return "Số điện thoại không hợp lệ";
 			}
-
+			var next = await _dAOCounter.GetNextSequenceAsync("User");
+			var userId = $"U{next:D6}";
 			var user = new UserModel
 			{
 				Username = request.Phone,
 				Password = request.Password,
 				PhoneNumber = request.Phone,
 				Fullname = request.Fullname,
-				userId = $"User_{Random.Shared.Next(100000, 999999)}",
-				Permissions = 0,
+				UserId = userId,
 				CreatedAt = DateTime.Now
 			};
 
@@ -118,7 +121,15 @@ namespace HMS_NewProject_Temp_Humdity.Services
 				Phone = user.Username,
 			};
 		}
+		public async Task<bool> HasCompanyPermission(string userId, CompanyPermission permission)
+		{
+			var user = await _dAOUser.GetByIdAsync(userId);
 
+			if (user == null)
+				return false;
+
+			return user.CompanyPermissions.HasFlag(permission);
+		}
 		private ClaimsPrincipal? ValidateRefreshToken(string token)
 		{
 			try
@@ -158,9 +169,8 @@ namespace HMS_NewProject_Temp_Humdity.Services
 
 			var claims = new List<Claim>
 			{
-				new Claim(JwtRegisteredClaimNames.Sub, userModel.userId!),
+				new Claim(JwtRegisteredClaimNames.Sub, userModel.UserId!),
 				new Claim(JwtRegisteredClaimNames.UniqueName, userModel.Username),
-				new Claim("permission", userModel!.Permissions.ToString()?? "0"),
 				new Claim("role", userModel!.Role.ToString()?? "Customer"),
 
 			};

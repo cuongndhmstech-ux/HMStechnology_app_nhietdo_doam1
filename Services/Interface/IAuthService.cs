@@ -1,4 +1,5 @@
-﻿using static HMS_NewProject_Temp_Humdity.DTO.AuthDTO;
+﻿using HMS_NewProject_Temp_Humdity.Models;
+using static HMS_NewProject_Temp_Humdity.DTO.AuthDTO;
 
 namespace HMS_NewProject_Temp_Humdity.Services.Interface
 {
@@ -11,6 +12,8 @@ namespace HMS_NewProject_Temp_Humdity.Services.Interface
 		Task<LoginResponse> RefreshTokenAsync(string refreshToken);
 
 		Task<bool> updateUser(ChangePasswordRequest request, string userId);
+
+		Task<bool> HasCompanyPermission(string userId, CompanyPermission permission);
 
 	}
 }

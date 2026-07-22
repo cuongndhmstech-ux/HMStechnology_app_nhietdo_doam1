@@ -2,12 +2,14 @@
 using HMS_NewProject_Temp_Humdity.DTO;
 using HMS_NewProject_Temp_Humdity.Models;
 using HMS_NewProject_Temp_Humdity.Services.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HMS_NewProject_Temp_Humdity.Controllers
 {
 	[ApiController]
 	[Route("user")]
+	[Authorize]
 	public class UserController : Controller
 	{
 		private readonly IUserService _userService;
@@ -101,6 +103,8 @@ namespace HMS_NewProject_Temp_Humdity.Controllers
 							Data = null
 						});
 					}
+
+
 
 				default:
 					return BadRequest("Invalid action");

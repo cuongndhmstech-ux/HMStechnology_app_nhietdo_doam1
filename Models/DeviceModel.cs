@@ -15,28 +15,36 @@ namespace HMS_NewProject_Temp_Humdity.Models
 
 		public int? DeviceId { get; set; }
 
-		public required string Imei { get; set; }
+		public string? Imei { get; set; }
+		public string? CompanyId { get; set; } // cty quan ly
 
-		public string? Name { get; set; }
+		public string? DeviceName { get; set; }
 
-		public required string UserId { get; set; }
+		public string? UserId { get; set; } // nguoi phu trach / nguoi so huu neu cty null
 
-		public required string LocationId { get; set; }
+		public string? LocationId { get; set; }
 
 		public DateTime? TimeStamp { get; set; } = DateTime.Now;
 
+		public bool IsActive { get; set; } = true;
+
+		public List<Sensor>? Sensors { get; set; }
+
+	}
+	public class Sensor
+	{
+		public string? NameSensor { get; set; }
 		public double TemperatureMin { get; set; }
 
 		public double TemperatureMax { get; set; }
 
-		public int HumidityMin { get; set; }
+		public double HumidityMin { get; set; }
 
-		public int HumidityMax { get; set; }
+		public double HumidityMax { get; set; }
 
-		public bool IsActive { get; set; } = true;
+		public DateTime UpdateAt { get; set; } = DateTime.Now;
 
 	}
-
 	public class DeviceRequestModel
 	{
 		public DeviceQueryType Type { get; set; }

@@ -40,9 +40,11 @@ builder.Services.AddSingleton<MongodbContext>();
 builder.Services.AddSingleton<IDAOUser, DAOUser>();
 builder.Services.AddSingleton<IDAODevice, DAODevice>();
 builder.Services.AddSingleton<IDAOLocation, DAOLocation>();
+builder.Services.AddSingleton<IDAOCompany, DAOCompany>();
+builder.Services.AddSingleton<IDAOCounter, DAOCounter>();
 
 
-////Service
+//Service
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IDeviceService, DeviceService>();
@@ -65,7 +67,6 @@ if (builder.Environment.IsDevelopment())
 		configuration.ReadFrom.Configuration(context.Configuration);
 	});
 }
-
 // JWT
 var secretKey = builder.Configuration["Jwt:SecretKey"]!;
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -84,17 +85,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 	});
 var app = builder.Build();
 app.UseMiddleware<GlobalExceptionMiddleware>();
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
 	app.UseSwagger();
 	app.UseSwaggerUI();
 }
-
-
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();

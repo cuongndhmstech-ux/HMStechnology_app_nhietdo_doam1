@@ -54,7 +54,7 @@ namespace HMS_NewProject_Temp_Humdity.Services
 			var combinedUpdate = Builders<LocationModel>.Update.Combine(updateDef);
 			bool isSuccess = await _dAOLocation.ModifyAsync(request.LocationId, combinedUpdate);
 			// cái này xử lí redis bên process data
-			await _hubDevice.NotifyLocationUpdatedAsync(request);
+			//await _hubDevice.NotifyLocationUpdatedAsync(request);
 			return isSuccess;
 		}
 
@@ -77,7 +77,7 @@ namespace HMS_NewProject_Temp_Humdity.Services
 
 			};
 			// cái này xử lí redis bên process data
-			await _hubDevice.NotifyLocationAddedAsync(device);
+			//await _hubDevice.NotifyLocationAddedAsync(device);
 			await _dAOLocation.CreateAsync(device);
 		}
 
@@ -87,8 +87,7 @@ namespace HMS_NewProject_Temp_Humdity.Services
 			var deleted = await _dAOLocation.DeleteAsync(request.LocationId);
 			if (!deleted) throw new ResourceNotFoundException("Device không tồn tại để xóa");
 			// cái này xử lí redis bên process data
-			await _hubDevice.NotifyLocationDeletedAsync(request);
-
+			//await _hubDevice.NotifyLocationDeletedAsync(request);
 		}
 	}
 }

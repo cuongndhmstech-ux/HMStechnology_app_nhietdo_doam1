@@ -104,5 +104,7 @@ namespace HMS_NewProject_Temp_Humdity.Signalr
 			if (_connection != null)
 				await _connection.DisposeAsync();
 		}
+
+
 	}
 }

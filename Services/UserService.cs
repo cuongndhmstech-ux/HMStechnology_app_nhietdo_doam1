@@ -10,10 +10,13 @@ namespace HMS_NewProject_Temp_Humdity.Services
 	{
 		private readonly ILogger<UserService> _logger;
 		private readonly IDAOUser _dAOUser;
-		public UserService(ILogger<UserService> logger, IDAOUser dAOUser)
+		private readonly IDAOCounter _dAOCounter;
+
+		public UserService(ILogger<UserService> logger, IDAOUser dAOUser, IDAOCounter dAOCounter)
 		{
 			_logger = logger;
 			_dAOUser = dAOUser;
+			_dAOCounter = dAOCounter;
 		}
 
 		public async Task<List<UserModel>> getUsers()
@@ -45,17 +48,17 @@ namespace HMS_NewProject_Temp_Humdity.Services
 			}
 
 			string userFullName = request.Fullname ?? "user_" + Guid.NewGuid().ToString("n").Substring(0, 8);
-			var randomCode = new Random().Next(100000, 999999); // Sinh số từ 100000 đến 999999
+			var next = await _dAOCounter.GetNextSequenceAsync("User");
+			var userId = $"U{next:D6}";
 			var user = new UserModel
 			{
-				userId = $"U{randomCode}",
+				UserId = userId,
 				Username = request.Username,
 				Password = BCrypt.Net.BCrypt.HashPassword(request.Password),
 				PhoneNumber = request.PhoneNumber,
 				Email = request.Email,
 				Fullname = userFullName,
 				CreatedAt = DateTime.Now,
-				Permissions = 0
 			};
 
 			await _dAOUser.CreateAsync(user);
@@ -67,7 +70,7 @@ namespace HMS_NewProject_Temp_Humdity.Services
 
 			var errors = new Dictionary<string, string>();
 
-			var currentUser = await _dAOUser.GetByIdAsync(request.userId);
+			var currentUser = await _dAOUser.GetByIdAsync(request.UserId);
 			if (currentUser == null)
 				throw new BadRequestException("Người dùng không tồn tại");
 			// ----  cấp tài khoản
@@ -81,15 +84,15 @@ namespace HMS_NewProject_Temp_Humdity.Services
 				));
 			}
 
-			if (await _dAOUser.ExistsAsync(x => x.Username == request.Username && x.userId != request.userId))
+			if (await _dAOUser.ExistsAsync(x => x.Username == request.Username && x.UserId != request.UserId))
 			{
 				errors["UserName"] = "userName đã tồn tại";
 			}
-			if (await _dAOUser.ExistsAsync(x => x.Email == request.Email && x.userId != request.userId))
+			if (await _dAOUser.ExistsAsync(x => x.Email == request.Email && x.UserId != request.UserId))
 			{
 				errors["Email"] = "email đã tồn tại";
 			}
-			if (await _dAOUser.ExistsAsync(x => x.PhoneNumber == request.PhoneNumber && x.userId != request.userId))
+			if (await _dAOUser.ExistsAsync(x => x.PhoneNumber == request.PhoneNumber && x.UserId != request.UserId))
 			{
 				errors["Phone"] = "số đã tồn tại";
 			}
@@ -113,9 +116,7 @@ namespace HMS_NewProject_Temp_Humdity.Services
 			// thêm trường cho app
 			updateDef.Add(Builders<UserModel>.Update.Set(x => x.UpdatedAt, DateTime.Now));
 
-			// cấp quyền
 
-			updateDef.Add(Builders<UserModel>.Update.Set(x => x.Permissions, request.Permissions));
 
 
 
@@ -124,13 +125,74 @@ namespace HMS_NewProject_Temp_Humdity.Services
 
 			var combinedUpdate = Builders<UserModel>.Update.Combine(updateDef);
 
-			bool isSuccess = await _dAOUser.ModifyAsync(request.userId, combinedUpdate);
+			bool isSuccess = await _dAOUser.ModifyAsync(request.UserId, combinedUpdate);
 
 			_logger.LogInformation("check " + isSuccess);
 
 			return isSuccess;
 		}
+		public async Task<bool> AddSharedAccesses(SharedAccessInfo request)
+		{
+			var updateDef = new List<UpdateDefinition<UserModel>>();
 
+			var errors = new Dictionary<string, string>();
+
+			var currentUser = await _dAOUser.GetByIdAsync(request.ownerId);
+			if (currentUser == null)
+				throw new BadRequestException("Người dùng không tồn tại");
+
+
+			if (request.scope == Scope.ACCOUNT)
+			{
+				var share = new SharedAccessInfo
+				{
+					shareId = Guid.NewGuid().ToString(),
+					ownerId = request.ownerId,
+					scope = Scope.ACCOUNT,
+					deviceIds = null,
+					permissions = request.permissions,
+					//shareStatus = ShareAcessStatus.Active,
+					//role = Role.User,
+					createdAt = DateTime.Now,
+					updatedAt = DateTime.Now
+				};
+
+				var update = Builders<UserModel>.Update.Push(
+					x => x.SharedAccesses,
+					share);
+			}
+
+			var share1 = new SharedAccessInfo
+			{
+				shareId = Guid.NewGuid().ToString(),
+				ownerId = request.ownerId,
+				scope = Scope.DEVICE,
+				deviceIds = request.deviceIds,
+				permissions = request.permissions,
+				//shareStatus = ShareAcessStatus.Active,
+				//role = Role.User,
+				createdAt = DateTime.Now,
+				updatedAt = DateTime.Now
+			};
+
+			var update1 = Builders<UserModel>.Update.Push(
+				x => x.SharedAccesses,
+				share1);
+
+
+
+
+			if (updateDef.Count == 0)
+				return false;
+
+			var combinedUpdate = Builders<UserModel>.Update.Combine(updateDef);
+
+			bool isSuccess = await _dAOUser.ModifyAsync(request.ownerId, combinedUpdate);
+
+			_logger.LogInformation("check " + isSuccess);
+
+			return isSuccess;
+		}
 		public async Task deleteUser(string id)
 		{
 			var deleted = await _dAOUser.DeleteAsync(id);

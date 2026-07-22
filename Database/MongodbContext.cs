@@ -16,9 +16,10 @@ namespace HMS_NewProject_Temp_Humdity.Database
 		}
 
 		public IMongoDatabase mongoDatabase => _database;
-		public IMongoCollection<UserModel> Users => _database.GetCollection<UserModel>("Users");
-		public IMongoCollection<DeviceModel> Devices => _database.GetCollection<DeviceModel>("Devices");
-		public IMongoCollection<LocationModel> Locations => _database.GetCollection<LocationModel>("Locations");
+		public IMongoCollection<UserModel> Users => _database.GetCollection<UserModel>("User");
+		public IMongoCollection<DeviceModel> Devices => _database.GetCollection<DeviceModel>("Device");
+		public IMongoCollection<LocationModel> Locations => _database.GetCollection<LocationModel>("Location");
+		public IMongoCollection<CompanyModel> companies => _database.GetCollection<CompanyModel>("company");
 
 		public async Task<bool> IsConnected()
 		{

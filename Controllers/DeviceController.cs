@@ -108,6 +108,7 @@ namespace HMS_NewProject_Temp_Humdity.Controllers
 							new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 						var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 						dto.UserId = userId;
+
 						if (dto == null)
 							return BadRequest("Invalid data");
 						await _deviceService.CreateDevice(dto);

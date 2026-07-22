@@ -33,7 +33,7 @@ namespace HMS_NewProject_Temp_Humdity.Database
 		{
 			try
 			{
-				var filter = Builders<UserModel>.Filter.Eq(x => x.userId, id);
+				var filter = Builders<UserModel>.Filter.Eq(x => x.UserId, id);
 				var result = await _mongo.UpdateOneAsync(filter, updateDefinition);
 				return result.MatchedCount > 0;
 			}
@@ -43,12 +43,11 @@ namespace HMS_NewProject_Temp_Humdity.Database
 				throw;
 			}
 		}
-
 		public async Task<bool> DeleteAsync(string id)
 		{
 			try
 			{
-				var result = await _mongo.DeleteOneAsync(x => x.userId == id);
+				var result = await _mongo.DeleteOneAsync(x => x.UserId == id);
 				return result.DeletedCount > 0;
 			}
 			catch (MongoException ex)
@@ -74,7 +73,7 @@ namespace HMS_NewProject_Temp_Humdity.Database
 			return await _mongo.Find(filter).FirstOrDefaultAsync();
 		}
 		public async Task<UserModel?> GetByIdAsync(string id)
-			=> await _mongo.Find(x => x.userId == id).FirstOrDefaultAsync();
+			=> await _mongo.Find(x => x.UserId == id).FirstOrDefaultAsync();
 
 		public async Task<bool> ExistsAsync(Expression<Func<UserModel, bool>> filter)
 			=> await _mongo.Find(filter).AnyAsync();

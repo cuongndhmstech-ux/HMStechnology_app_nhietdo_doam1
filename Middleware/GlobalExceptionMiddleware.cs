@@ -64,9 +64,9 @@ namespace HMS_NewProject_Temp_Humdity.Middleware
 					 badReqEx.Message,
 					 null),
 
-				UnauthorizedAccessException =>
+				UnauthorizedAccessException unAuEx =>
 					(StatusCodes.Status401Unauthorized,
-					 "Bạn không có quyền truy cập tài nguyên này",
+					unAuEx.Message,
 					 null),
 
 				ArgumentNullException argNullEx =>

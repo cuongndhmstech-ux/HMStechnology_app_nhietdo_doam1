@@ -26,7 +26,6 @@ namespace HMS_NewProject_Temp_Humdity.Services
 
 		public async Task<List<LocationResponse>> GetAllDeviceAndLocation()
 		{
-			_logger.LogInformation("Getting all devices and locations.");
 
 			var locationFilter = Builders<LocationModel>.Filter.Empty;
 			var deviceFilter = Builders<DeviceModel>.Filter.Empty;
@@ -34,32 +33,48 @@ namespace HMS_NewProject_Temp_Humdity.Services
 			var locations = await _dAOLocation.GetAllAsync(locationFilter);
 			var devices = await _dAODevice.GetAsync(deviceFilter);
 
-			_logger.LogInformation(
-				"Found {LocationCount} locations and {DeviceCount} devices.",
-				locations.Count,
-				devices.Count);
+			_logger.LogInformation("Found {LocationCount} locations and {DeviceCount} devices.", locations.Count, devices.Count);
 
 			var lookup = devices.ToLookup(x => x.LocationId);
 
 			var result = locations.Select(x =>
 			{
 				var deviceCount = lookup[x.LocationId].Count();
-				_logger.LogInformation(
-					"Location {LocationId} ({LocationName}) has {DeviceCount} devices.",
-					x.LocationId,
-					x.Name,
-					deviceCount);
+
+				_logger.LogInformation("Location {LocationId} ({LocationName}) has {DeviceCount} devices.", x.LocationId, x.Name, deviceCount);
 
 				return new LocationResponse
 				{
-					LocationId = x.LocationId,
+					LocationId = x.LocationId!,
 					UserId = x.UserId,
 					Name = x.Name,
 					Devices = lookup[x.LocationId].ToList()
 				};
 			}).ToList();
+			var locationIds = locations
+				.Where(x => !string.IsNullOrWhiteSpace(x.LocationId))
+				.Select(x => x.LocationId!)
+				.ToHashSet();
+
+			var unassignedDevices = devices
+				.Where(d => string.IsNullOrWhiteSpace(d.LocationId) || !locationIds.Contains(d.LocationId))
+				.ToList();
+
+			if (unassignedDevices.Any())
+			{
+				_logger.LogInformation("Found {DeviceCount} unassigned devices.", unassignedDevices.Count);
+
+				result.Add(new LocationResponse
+				{
+					LocationId = "UNASSIGNED",
+					UserId = null,
+					Name = "Chưa gán vị trí",
+					Devices = unassignedDevices
+				});
+			}
 
 			_logger.LogInformation("Returning {LocationCount} locations.", result.Count);
+
 			return result;
 		}
 
@@ -107,10 +122,7 @@ namespace HMS_NewProject_Temp_Humdity.Services
 			// cập nhập từng trường
 			var updateDef = new List<UpdateDefinition<DeviceModel>>();
 			updateDef.Add(Builders<DeviceModel>.Update.Set(x => x.LocationId, request.LocationId));
-			updateDef.Add(Builders<DeviceModel>.Update.Set(x => x.TemperatureMax, request.TemperatureMax));
-			updateDef.Add(Builders<DeviceModel>.Update.Set(x => x.TemperatureMin, request.TemperatureMin));
-			updateDef.Add(Builders<DeviceModel>.Update.Set(x => x.HumidityMax, request.HumidityMax));
-			updateDef.Add(Builders<DeviceModel>.Update.Set(x => x.HumidityMin, request.HumidityMin));
+			updateDef.Add(Builders<DeviceModel>.Update.Set(x => x.Sensors, request.Sensors));
 			updateDef.Add(Builders<DeviceModel>.Update.Set(x => x.TimeStamp, DateTime.Now));
 			updateDef.Add(Builders<DeviceModel>.Update.Set(x => x.IsActive, request.IsActive));
 
@@ -131,23 +143,29 @@ namespace HMS_NewProject_Temp_Humdity.Services
 			{
 				throw new DuplicateResourceException("thiết bị đã tồn tại");
 			}
-			if (!await _dAOLocation.ExistsAsync(x => x.LocationId == request.LocationId))
-			{
-				throw new ResourceNotFoundException("địa điểm chưa có");
-			}
 			var randomCode = new Random().Next(100000, 999999);
+			var sensors = new List<Sensor>();
+
+			for (int i = 1; i <= 4; i++)
+			{
+				sensors.Add(new Sensor
+				{
+					NameSensor = $"Sensor {i}",
+					TemperatureMin = 18,
+					TemperatureMax = 30,
+					HumidityMin = 40,
+					HumidityMax = 80
+				});
+			}
 
 			var device = new DeviceModel
 			{
 				DeviceId = randomCode,
+				DeviceName = request.DeviceName,
 				UserId = request.UserId,
 				Imei = request.Imei,
 				LocationId = request.LocationId,
-				HumidityMax = 60,
-				TemperatureMin = 15,
-				HumidityMin = 45,
-				TemperatureMax = 25,
-
+				Sensors = sensors
 			};
 			// cái này xử lí redis bên process data
 			await _hubDevice.NotifyDeviceAddedAsync(request);
