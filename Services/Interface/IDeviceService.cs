@@ -13,7 +13,7 @@ namespace HMS_NewProject_Temp_Humdity.Services.Interface
 		Task<DeviceModel> GetDeviceByIMEI(string? IMEI);
 
 		Task DeleteDevice(int deviceId);
-
-		//Task<List<DeviceModel>> GetDeviceOnline(int? Companyid);
-	}
+		Task<List<LocationResponse>> GetDevicesByUserIdAsync(string userId);
+        //Task<List<DeviceModel>> GetDeviceOnline(int? Companyid);
+    }
 }

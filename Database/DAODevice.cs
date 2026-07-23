@@ -23,8 +23,23 @@ namespace HMS_NewProject_Temp_Humdity.Database
 
 			return await _mongo.Find(filter).ToListAsync();
 		}
+		public async Task<List<DeviceModel>> GetDeviceByUserIdAsync(string userId)
+		{
+			try
+			{
+				var filter = Builders<DeviceModel>.Filter.Eq(dv => dv.UserId, userId);
+				var result = await _mongo.Find(filter).ToListAsync();
+				return result;
+			}
+			catch(Exception ex)
+			{
+				_logger.LogError(ex, "Error when get list device, detail: {Message}", ex.Message);
+				return new List<DeviceModel>();
+			}
 
-		public async Task<DeviceModel?> GetAsyncByImei(string imei)
+        }
+
+        public async Task<DeviceModel?> GetAsyncByImei(string imei)
 			=> await _mongo.Find(x => x.Imei == imei).FirstOrDefaultAsync();
 		public async Task CreateAsync(DeviceModel device)
 		{

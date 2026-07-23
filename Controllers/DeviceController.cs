@@ -21,11 +21,25 @@ namespace HMS_NewProject_Temp_Humdity.Controllers
 			_deviceService = deviceService;
 		}
 		[HttpPost("query")]
-		[ApiKey]
+		//[ApiKey]
 		public async Task<IActionResult> Query([FromBody] DeviceRequestModel request)
 		{
 			switch (request.Type)
 			{
+				case DeviceQueryType.GetByUserId:
+					{
+                        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                        // Gọi hàm Service đã sửa ở trên
+                        var data = await _deviceService.GetDevicesByUserIdAsync(userId);
+                        return Ok(new ApiResponse<List<LocationResponse>>
+                        {
+                            Success = true,
+                            Message = "Lấy danh sách thiết bị và phòng thành công",
+                            Data = data
+                        });
+                    } 
+					
 				case DeviceQueryType.GetDeviceAndLocationByUserId:
 					{
 						return StatusCode(201, new ApiResponse<object>
@@ -51,9 +65,7 @@ namespace HMS_NewProject_Temp_Humdity.Controllers
 				case DeviceActionType.Create:
 					{
 
-						var dto = JsonSerializer.Deserialize<DeviceModel>(
-							model.Info,
-							new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+						var dto = model.Info;
 
 						if (dto == null)
 							return BadRequest("Invalid data");
@@ -68,9 +80,7 @@ namespace HMS_NewProject_Temp_Humdity.Controllers
 					}
 				case DeviceActionType.Update:
 					{
-						var dto = JsonSerializer.Deserialize<DeviceModel>(
-													model.Info,
-													new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+						var dto = model.Info;
 						if (dto == null)
 							return BadRequest("Invalid data");
 
@@ -85,13 +95,11 @@ namespace HMS_NewProject_Temp_Humdity.Controllers
 					}
 				case DeviceActionType.Delete:
 					{
-						var dto = JsonSerializer.Deserialize<int>(
-							model.Info,
-							new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+						var dto = model.Info;
 
 						if (dto == null)
 							return BadRequest("Invalid data");
-						await _deviceService.DeleteDevice(dto);
+						await _deviceService.DeleteDevice(dto.DeviceId.Value);
 
 						return Ok(new ApiResponse<object>
 						{
@@ -103,9 +111,7 @@ namespace HMS_NewProject_Temp_Humdity.Controllers
 				case DeviceActionType.UserCreate:
 					{
 
-						var dto = JsonSerializer.Deserialize<DeviceModel>(
-							model.Info,
-							new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+						var dto = model.Info;
 						var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 						dto.UserId = userId;
 

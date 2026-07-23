@@ -16,19 +16,19 @@ namespace HMS_NewProject_Temp_Humdity.Models
 		public int? DeviceId { get; set; }
 
 		public string? Imei { get; set; }
-		public string? CompanyId { get; set; } // cty quan ly
+		public string? CompanyId { get; set; } = string.Empty; // cty quan ly 
 
 		public string? DeviceName { get; set; }
 
 		public string? UserId { get; set; } // nguoi phu trach / nguoi so huu neu cty null
 
-		public string? LocationId { get; set; }
+		public string? LocationId { get; set; } = string.Empty;
 
 		public DateTime? TimeStamp { get; set; } = DateTime.Now;
 
 		public bool IsActive { get; set; } = true;
 
-		public List<Sensor>? Sensors { get; set; }
+		public List<Sensor> Sensors { get; set; } = new List<Sensor>();
 
 	}
 	public class Sensor
@@ -58,11 +58,12 @@ namespace HMS_NewProject_Temp_Humdity.Models
 	public class DeviceActionModel
 	{
 		public DeviceActionType actionType { get; set; }
-		public JsonElement Info { get; set; }
+		public DeviceModel Info { get; set; }
 	}
 	public enum DeviceQueryType
 	{
 		GetAll = 1,
+		GetByUserId = 2,
 		GetDeviceAndLocationByUserId = 3,
 
 	}

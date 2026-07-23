@@ -20,5 +20,7 @@ namespace HMS_NewProject_Temp_Humdity.Database.Interface
 		Task<bool> DeleteAsync(int id);
 
 		//Task<List<DeviceModel>> GetDeviceStatusAsync(int Companyid, List<clsDeviceLastLogModel> deviceModels);
-	}
+		Task<List<DeviceModel>> GetDeviceByUserIdAsync(string userId);
+
+    }
 }

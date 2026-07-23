@@ -77,7 +77,46 @@ namespace HMS_NewProject_Temp_Humdity.Services
 
 			return result;
 		}
+		public async Task<List<LocationResponse>> GetDevicesByUserIdAsync(string userId)
+		{
+			try
+			{
+				//if (string.IsNullOrEmpty(userId)) return new List<DeviceModel>();
+                var locationFilter = Builders<LocationModel>.Filter.Eq(x => x.UserId, userId);
+                var locations = await _dAOLocation.GetAllAsync(locationFilter);
+                var devices = await _dAODevice.GetDeviceByUserIdAsync(userId);
+                //Phân nhóm thiết bị theo LocationId
+                var lookup = devices.ToLookup(x => x.LocationId);
+                var result = locations.Select(x => new LocationResponse
+                {
+                    LocationId = x.LocationId!,
+                    UserId = x.UserId,
+                    Name = x.Name,
+                    Devices = lookup[x.LocationId].ToList()
+                }).ToList();
+                var assignedLocationIds = locations.Select(l => l.LocationId).ToHashSet();
+                var unassignedDevices = devices
+                    .Where(d => string.IsNullOrEmpty(d.LocationId) || !assignedLocationIds.Contains(d.LocationId))
+                    .ToList();
 
+                if (unassignedDevices.Any())
+                {
+                    result.Insert(0, new LocationResponse // Đưa lên đầu danh sách để User dễ thấy
+                    {
+                        LocationId = "UNASSIGNED",
+                        UserId = userId,
+                        Name = "Thiết bị chưa gán phòng",
+                        Devices = unassignedDevices
+                    });
+                }
+
+                return result;
+			}
+			catch(Exception ex)
+			{
+				return new List<LocationResponse>();
+			}
+		}
 
 		public async Task<List<DeviceModel>> getDeviceAndLocation2(LocationModel location, DeviceModel deviceModel)
 		{
@@ -144,19 +183,18 @@ namespace HMS_NewProject_Temp_Humdity.Services
 				throw new DuplicateResourceException("thiết bị đã tồn tại");
 			}
 			var randomCode = new Random().Next(100000, 999999);
-			var sensors = new List<Sensor>();
 
-			for (int i = 1; i <= 4; i++)
-			{
-				sensors.Add(new Sensor
-				{
-					NameSensor = $"Sensor {i}",
-					TemperatureMin = 18,
-					TemperatureMax = 30,
-					HumidityMin = 40,
-					HumidityMax = 80
-				});
-			}
+			//for (int i = 1; i <= 4; i++)
+			//{
+			//	sensors.Add(new Sensor
+			//	{
+			//		NameSensor = $"Sensor {i}",
+			//		TemperatureMin = 18,
+			//		TemperatureMax = 30,
+			//		HumidityMin = 40,
+			//		HumidityMax = 80
+			//	});
+			//}
 
 			var device = new DeviceModel
 			{
@@ -164,8 +202,9 @@ namespace HMS_NewProject_Temp_Humdity.Services
 				DeviceName = request.DeviceName,
 				UserId = request.UserId,
 				Imei = request.Imei,
-				LocationId = request.LocationId,
-				Sensors = sensors
+				LocationId = string.IsNullOrEmpty(request.LocationId) ? string.Empty : request.LocationId,
+				Sensors = new List<Sensor>(),
+				TimeStamp = DateTime.Now
 			};
 			// cái này xử lí redis bên process data
 			await _hubDevice.NotifyDeviceAddedAsync(request);
