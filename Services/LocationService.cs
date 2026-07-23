@@ -1,5 +1,6 @@
 ﻿using HMS_NewProject_Temp_Humdity.BaseException;
 using HMS_NewProject_Temp_Humdity.Database.Interface;
+using HMS_NewProject_Temp_Humdity.DTO;
 using HMS_NewProject_Temp_Humdity.Models;
 using HMS_NewProject_Temp_Humdity.Services.Interface;
 using HMS_NewProject_Temp_Humdity.Signalr.Interface;
@@ -35,13 +36,32 @@ namespace HMS_NewProject_Temp_Humdity.Services
 
 			return await _dAOLocation.GetAllAsync(mongoFilter);
 		}
-
-		public async Task<bool> UpdateInfoLocation(LocationModel request)
+		public async Task<ApiResponse<List<LocationModel>>> GetLocationByUserIdAsync(string userId)
 		{
 
+			try
+			{
+                var result = await _dAOLocation.GetLocationByUserId(userId);
+                return new ApiResponse<List<LocationModel>>
+                {
+                    Success = true,
+                    Message = "Lấy danh sách phòng thành công",
+                    Data = result
+                };
+            }
+			catch(Exception ex)
+			{
+                return new ApiResponse<List<LocationModel>>
+                {
+                    Success = false,
+                    Message = "Có lỗi xảy ra khi truy xuất dữ liệu", // Không nên trả ex.Message thô cho FE
+                    Data = null
+                };
+            }
+		}
 
-
-
+        public async Task<bool> UpdateInfoLocation(LocationModel request)
+		{
 			if (!await _dAOLocation.ExistsAsync(x => x.LocationId == request.LocationId && x.UserId == request.UserId))
 			{
 				throw new ResourceNotFoundException("địa điểm chưa có");
@@ -58,7 +78,7 @@ namespace HMS_NewProject_Temp_Humdity.Services
 			return isSuccess;
 		}
 
-		public async Task CreateLocation(string name, string userId)
+		public async Task<ApiResponse<object>> CreateLocation(string name, string userId)
 		{
 
 			var randomCode = new Random().Next(100000, 999999);
@@ -66,19 +86,31 @@ namespace HMS_NewProject_Temp_Humdity.Services
 
 			if (await _dAOLocation.ExistsAsync(x => x.Name == name && x.UserId == userId))
 			{
-				throw new DuplicateResourceException("Địa điểm đã tồn tại");
+				return new ApiResponse<object>
+				{
+					Success = false,
+					Message = "Địa điểm (phòng) đã tồn tại",
+					Data = null
+				};
 			}
 
-			var device = new LocationModel
+			var location = new LocationModel
 			{
 				LocationId = $"L{randomCode}",
 				Name = name,
 				UserId = userId,
+				CreatedAt = DateTime.Now
 
 			};
 			// cái này xử lí redis bên process data
 			//await _hubDevice.NotifyLocationAddedAsync(device);
-			await _dAOLocation.CreateAsync(device);
+			await _dAOLocation.CreateAsync(location);
+			return new ApiResponse<object>
+			{
+				Success = true,
+				Message = "Tạo mới phòngt thành công",
+				Data = location
+			};
 		}
 
 		public async Task DeleteLocation(LocationModel request)

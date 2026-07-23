@@ -25,52 +25,45 @@ namespace HMS_NewProject_Temp_Humdity.Controllers
 		[HttpPost("query")]
 		public async Task<IActionResult> Query([FromBody] UserRequestModel request)
 		{
-			var result = request.Type switch
+			switch(request.Type)
 			{
-				QueryType.GetAll =>
-
-					Ok(new ApiResponse<List<LocationModel>>
+				case QueryType.GetByUserId:
 					{
-						Success = true,
-						Message = "Lấy hết danh sách người  thành công",
-						Data = await _locationService.getAll()
-					}),
-				_ => null
-			};
-			if (result is null)
-			{
-				return BadRequest("Invalid query type");
-			}
-			return result;
+						var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+						var result = await _locationService.GetLocationByUserIdAsync(userId);
+						if(!result.Success)
+						{
+							return StatusCode(500, result);
+						}
+                        return Ok(result);
+                    }
+				default:
+                    return BadRequest("Invalid action");
+
+            }
 		}
 
 		[HttpPost("update")]
-		public async Task<IActionResult> Update([FromBody] UserActionRequest request)
+		public async Task<IActionResult> Update([FromBody] LocationActionRequest request)
 		{
 			switch (request.actionType)
 			{
-				//case UserActionType.Create:
-				//	{
-				//		var dto = JsonSerializer.Deserialize<CompanyModel>(
-				//			request.Info,
-				//			new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-				//		if (dto == null)
-				//			return BadRequest("Invalid data");
-				//		await _locationService.CreateLocation(dto.LocationId, dto.Name, dto.UserId);
+				case UserActionType.Create:
+					{
+						var dto = request.Info;
+						var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+						var result = await _locationService.CreateLocation(dto.Name, userId);
+						if(!result.Success)
+						{
+							return BadRequest(result);
+						}
+						return Ok(result);
 
-				//		return StatusCode(201, new ApiResponse<object>
-				//		{
-				//			Success = true,
-				//			Message = "Tạo mới thành công",
-				//			Data = null
-				//		});
-				//	}
+					}
 				case UserActionType.Update:
 					{
-						var dto = JsonSerializer.Deserialize<LocationModel>(
-													request.Info,
-													new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
+						var dto = request.Info;
+						dto.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 						if (!await _locationService.UpdateInfoLocation(dto))
 						{
 							return Ok(new ApiResponse<object>
@@ -90,10 +83,7 @@ namespace HMS_NewProject_Temp_Humdity.Controllers
 					}
 				case UserActionType.Delete:
 					{
-						var dto = JsonSerializer.Deserialize<LocationModel>(
-							request.Info,
-							new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
+						var dto = request.Info;
 						if (dto == null)
 							return BadRequest("Invalid data");
 
@@ -110,9 +100,7 @@ namespace HMS_NewProject_Temp_Humdity.Controllers
 					{
 
 
-						var dto = JsonSerializer.Deserialize<LocationModel>(
-							request.Info,
-							new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+						var dto = request.Info;
 
 						if (dto == null)
 							return BadRequest("Invalid data");
@@ -130,9 +118,7 @@ namespace HMS_NewProject_Temp_Humdity.Controllers
 					}
 				case UserActionType.UserUpdate:
 					{
-						var dto = JsonSerializer.Deserialize<LocationModel>(
-																			request.Info,
-																			new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+						var dto = request.Info;
 
 						var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -156,9 +142,7 @@ namespace HMS_NewProject_Temp_Humdity.Controllers
 					}
 				case UserActionType.UserDelete:
 					{
-						var dto = JsonSerializer.Deserialize<LocationModel>(
-							request.Info,
-							new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+						var dto = request.Info;
 
 						if (dto == null)
 							return BadRequest("Invalid data");

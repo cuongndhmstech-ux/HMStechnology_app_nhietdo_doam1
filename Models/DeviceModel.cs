@@ -50,10 +50,9 @@ namespace HMS_NewProject_Temp_Humdity.Models
 		public DeviceQueryType Type { get; set; }
 
 		public string? UserId { get; set; }
+        public string? LocationId { get; set; }
 
-
-
-	}
+    }
 
 	public class DeviceActionModel
 	{
@@ -65,6 +64,7 @@ namespace HMS_NewProject_Temp_Humdity.Models
 		GetAll = 1,
 		GetByUserId = 2,
 		GetDeviceAndLocationByUserId = 3,
+		GetLocationDetail = 4
 
 	}
 	public enum DeviceActionType

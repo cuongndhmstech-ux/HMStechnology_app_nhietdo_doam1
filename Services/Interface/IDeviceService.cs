@@ -7,8 +7,9 @@ namespace HMS_NewProject_Temp_Humdity.Services.Interface
 		Task<List<LocationResponse>> GetAllDeviceAndLocation();
 
 		Task<bool> UpdateInfoDevice(DeviceModel request);
+		Task<clsLocationDetailModel> GetLocationDetailAsync(string userId, string locationId);
 
-		Task CreateDevice(DeviceModel request);
+        Task CreateDevice(DeviceModel request);
 
 		Task<DeviceModel> GetDeviceByIMEI(string? IMEI);
 

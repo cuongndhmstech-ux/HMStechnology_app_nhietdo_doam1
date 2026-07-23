@@ -30,7 +30,6 @@ namespace HMS_NewProject_Temp_Humdity.Controllers
 					{
                         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-                        // Gọi hàm Service đã sửa ở trên
                         var data = await _deviceService.GetDevicesByUserIdAsync(userId);
                         return Ok(new ApiResponse<List<LocationResponse>>
                         {
@@ -50,6 +49,21 @@ namespace HMS_NewProject_Temp_Humdity.Controllers
 							Data = await _deviceService.GetAllDeviceAndLocation()
 						});
 					}
+				case DeviceQueryType.GetLocationDetail:
+					{
+						var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                        if (string.IsNullOrEmpty(request.LocationId))
+                        {
+                            return BadRequest("Thiếu LocationId để xem chi tiết");
+                        }
+						var data = await _deviceService.GetLocationDetailAsync(userId, request.LocationId);
+                        return Ok(new ApiResponse<clsLocationDetailModel>
+                        {
+                            Success = true,
+                            Message = "Lấy chi tiết phòng thành công",
+                            Data = data
+                        });
+                    }
 
 				default:
 					return BadRequest("Invalid action");

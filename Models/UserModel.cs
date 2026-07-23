@@ -114,6 +114,7 @@ namespace HMS_NewProject_Temp_Humdity.Models
 		GetAll = 1,
 		GetByCompanyId = 2,
 		GetById = 3,
+		GetByUserId = 4
 	}
 	public enum UserActionType
 	{

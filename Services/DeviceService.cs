@@ -82,37 +82,37 @@ namespace HMS_NewProject_Temp_Humdity.Services
 			try
 			{
 				//if (string.IsNullOrEmpty(userId)) return new List<DeviceModel>();
-                var locationFilter = Builders<LocationModel>.Filter.Eq(x => x.UserId, userId);
-                var locations = await _dAOLocation.GetAllAsync(locationFilter);
-                var devices = await _dAODevice.GetDeviceByUserIdAsync(userId);
-                //Phân nhóm thiết bị theo LocationId
-                var lookup = devices.ToLookup(x => x.LocationId);
-                var result = locations.Select(x => new LocationResponse
-                {
-                    LocationId = x.LocationId!,
-                    UserId = x.UserId,
-                    Name = x.Name,
-                    Devices = lookup[x.LocationId].ToList()
-                }).ToList();
-                var assignedLocationIds = locations.Select(l => l.LocationId).ToHashSet();
-                var unassignedDevices = devices
-                    .Where(d => string.IsNullOrEmpty(d.LocationId) || !assignedLocationIds.Contains(d.LocationId))
-                    .ToList();
+				var locationFilter = Builders<LocationModel>.Filter.Eq(x => x.UserId, userId);
+				var locations = await _dAOLocation.GetAllAsync(locationFilter);
+				var devices = await _dAODevice.GetDeviceByUserIdAsync(userId);
+				//Phân nhóm thiết bị theo LocationId
+				var lookup = devices.ToLookup(x => x.LocationId);
+				var result = locations.Select(x => new LocationResponse
+				{
+					LocationId = x.LocationId!,
+					UserId = x.UserId,
+					Name = x.Name,
+					Devices = lookup[x.LocationId].ToList()
+				}).ToList();
+				var assignedLocationIds = locations.Select(l => l.LocationId).ToHashSet();
+				var unassignedDevices = devices
+					.Where(d => string.IsNullOrEmpty(d.LocationId) || !assignedLocationIds.Contains(d.LocationId))
+					.ToList();
 
-                if (unassignedDevices.Any())
-                {
-                    result.Insert(0, new LocationResponse // Đưa lên đầu danh sách để User dễ thấy
-                    {
-                        LocationId = "UNASSIGNED",
-                        UserId = userId,
-                        Name = "Thiết bị chưa gán phòng",
-                        Devices = unassignedDevices
-                    });
-                }
+				if (unassignedDevices.Any())
+				{
+					result.Insert(0, new LocationResponse
+					{
+						LocationId = "UNASSIGNED",
+						UserId = userId,
+						Name = "Thiết bị chưa gán phòng",
+						Devices = unassignedDevices
+					});
+				}
 
-                return result;
+				return result;
 			}
-			catch(Exception ex)
+			catch (Exception ex)
 			{
 				return new List<LocationResponse>();
 			}
@@ -220,6 +220,23 @@ namespace HMS_NewProject_Temp_Humdity.Services
 			//await _hub.NotifyDeviceDeletedAsync(device); 
 
 		}
+
+		public async Task<clsLocationDetailModel> GetLocationDetailAsync(string userId, string locationId)
+		{
+			//lấy thông tin phòng
+			var location = await _dAOLocation.GetAsync(x => x.LocationId == locationId && x.UserId == userId);
+			if(location == null) { throw new ResourceNotFoundException("Phòng không tồn tại"); }
+			var allDevices = await _dAODevice.GetDeviceByUserIdAsync(userId);
+			var response = new clsLocationDetailModel
+			{
+				LocationId = location.LocationId,
+				Name = location.Name,
+				AssignedDevices = allDevices.Where(d => d.LocationId == locationId).ToList(),
+				AvailableDevices = allDevices.Where(d => string.IsNullOrEmpty(d.LocationId)).ToList()
+			};
+			return response;
+		}
+
 
 
 		//public async Task<List<DeviceModel>?> GetDeviceOnline(int? Companyid)
