@@ -1,4 +1,4 @@
-﻿namespace HMS_NewProject_Temp_Humdity.Models.Config
+﻿namespace HMS_Temp_Humdity_ApiManager.Models.Config
 {
 	public class clsAppConfig
 	{

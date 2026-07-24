@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace HMS_NewProject_Temp_Humdity.Middleware
+namespace HMS_Temp_Humdity_ApiManager.Middleware
 {
 	public class ApiKeyAttribute : Attribute, IAsyncActionFilter
 	{

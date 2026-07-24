@@ -1,11 +1,11 @@
 ﻿using System.Text.Json;
-using HMS_NewProject_Temp_Humdity.DTO;
-using HMS_NewProject_Temp_Humdity.Models;
-using HMS_NewProject_Temp_Humdity.Services.Interface;
+using HMS_Temp_Humdity_ApiManager.DTO;
+using HMS_Temp_Humdity_ApiManager.Models;
+using HMS_Temp_Humdity_ApiManager.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace HMS_NewProject_Temp_Humdity.Controllers
+namespace HMS_Temp_Humdity_ApiManager.Controllers
 {
 	[ApiController]
 	[Route("user")]

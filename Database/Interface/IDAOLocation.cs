@@ -1,8 +1,8 @@
 ﻿using System.Linq.Expressions;
-using HMS_NewProject_Temp_Humdity.Models;
+using HMS_Temp_Humdity_ApiManager.Models;
 using MongoDB.Driver;
 
-namespace HMS_NewProject_Temp_Humdity.Database.Interface
+namespace HMS_Temp_Humdity_ApiManager.Database.Interface
 {
 	public interface IDAOLocation
 	{
@@ -10,7 +10,7 @@ namespace HMS_NewProject_Temp_Humdity.Database.Interface
 
 		Task<LocationModel?> GetAsync(Expression<Func<LocationModel, bool>> filter);
 
-        Task CreateAsync(LocationModel device);
+		Task CreateAsync(LocationModel device);
 
 		Task<bool> ModifyAsync(string id, UpdateDefinition<LocationModel> updateDefinition);
 
@@ -19,5 +19,5 @@ namespace HMS_NewProject_Temp_Humdity.Database.Interface
 		Task<bool> DeleteAsync(string id);
 		Task<List<LocationModel>> GetLocationByUserId(string userId);
 
-    }
+	}
 }

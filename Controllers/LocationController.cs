@@ -1,12 +1,11 @@
 ﻿using System.Security.Claims;
-using System.Text.Json;
-using HMS_NewProject_Temp_Humdity.DTO;
-using HMS_NewProject_Temp_Humdity.Models;
-using HMS_NewProject_Temp_Humdity.Services.Interface;
+using HMS_Temp_Humdity_ApiManager.DTO;
+using HMS_Temp_Humdity_ApiManager.Models;
+using HMS_Temp_Humdity_ApiManager.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace HMS_NewProject_Temp_Humdity.Controllers
+namespace HMS_Temp_Humdity_ApiManager.Controllers
 {
 	[ApiController]
 	[Route("location")]
@@ -25,22 +24,22 @@ namespace HMS_NewProject_Temp_Humdity.Controllers
 		[HttpPost("query")]
 		public async Task<IActionResult> Query([FromBody] UserRequestModel request)
 		{
-			switch(request.Type)
+			switch (request.Type)
 			{
 				case QueryType.GetByUserId:
 					{
 						var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 						var result = await _locationService.GetLocationByUserIdAsync(userId);
-						if(!result.Success)
+						if (!result.Success)
 						{
 							return StatusCode(500, result);
 						}
-                        return Ok(result);
-                    }
+						return Ok(result);
+					}
 				default:
-                    return BadRequest("Invalid action");
+					return BadRequest("Invalid action");
 
-            }
+			}
 		}
 
 		[HttpPost("update")]
@@ -53,7 +52,7 @@ namespace HMS_NewProject_Temp_Humdity.Controllers
 						var dto = request.Info;
 						var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 						var result = await _locationService.CreateLocation(dto.Name, userId);
-						if(!result.Success)
+						if (!result.Success)
 						{
 							return BadRequest(result);
 						}
@@ -98,10 +97,7 @@ namespace HMS_NewProject_Temp_Humdity.Controllers
 					}
 				case UserActionType.UserCreate:
 					{
-
-
 						var dto = request.Info;
-
 						if (dto == null)
 							return BadRequest("Invalid data");
 

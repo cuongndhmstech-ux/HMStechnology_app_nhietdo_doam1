@@ -1,7 +1,7 @@
-﻿using HMS_NewProject_Temp_Humdity.BaseException;
-using HMS_NewProject_Temp_Humdity.DTO;
+﻿using HMS_Temp_Humdity_ApiManager.BaseException;
+using HMS_Temp_Humdity_ApiManager.DTO;
 
-namespace HMS_NewProject_Temp_Humdity.Middleware
+namespace HMS_Temp_Humdity_ApiManager.Middleware
 {
 	public class GlobalExceptionMiddleware
 	{

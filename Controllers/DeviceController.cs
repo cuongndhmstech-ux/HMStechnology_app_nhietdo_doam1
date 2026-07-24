@@ -1,13 +1,11 @@
 ﻿using System.Security.Claims;
-using System.Text.Json;
-using HMS_NewProject_Temp_Humdity.DTO;
-using HMS_NewProject_Temp_Humdity.Middleware;
-using HMS_NewProject_Temp_Humdity.Models;
-using HMS_NewProject_Temp_Humdity.Services.Interface;
+using HMS_Temp_Humdity_ApiManager.DTO;
+using HMS_Temp_Humdity_ApiManager.Models;
+using HMS_Temp_Humdity_ApiManager.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace HMS_NewProject_Temp_Humdity.Controllers
+namespace HMS_Temp_Humdity_ApiManager.Controllers
 {
 
 	[ApiController]
@@ -28,22 +26,21 @@ namespace HMS_NewProject_Temp_Humdity.Controllers
 			{
 				case DeviceQueryType.GetByUserId:
 					{
-                        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+						var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-                        var data = await _deviceService.GetDevicesByUserIdAsync(userId);
-                        return Ok(new ApiResponse<List<LocationResponse>>
-                        {
-                            Success = true,
-                            Message = "Lấy danh sách thiết bị và phòng thành công",
-                            Data = data
-                        });
-                    } 
-					
+						var data = await _deviceService.GetDevicesByUserIdAsync(userId);
+						return Ok(new ApiResponse<List<LocationResponse>>
+						{
+							Success = true,
+							Message = "Lấy danh sách thiết bị và phòng thành công",
+							Data = data
+						});
+					}
+
 				case DeviceQueryType.GetDeviceAndLocationByUserId:
 					{
 						return StatusCode(201, new ApiResponse<object>
 						{
-
 							Success = true,
 							Message = "Lấy dánh sách thành công",
 							Data = await _deviceService.GetAllDeviceAndLocation()
@@ -52,18 +49,18 @@ namespace HMS_NewProject_Temp_Humdity.Controllers
 				case DeviceQueryType.GetLocationDetail:
 					{
 						var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                        if (string.IsNullOrEmpty(request.LocationId))
-                        {
-                            return BadRequest("Thiếu LocationId để xem chi tiết");
-                        }
+						if (string.IsNullOrEmpty(request.LocationId))
+						{
+							return BadRequest("Thiếu LocationId để xem chi tiết");
+						}
 						var data = await _deviceService.GetLocationDetailAsync(userId, request.LocationId);
-                        return Ok(new ApiResponse<clsLocationDetailModel>
-                        {
-                            Success = true,
-                            Message = "Lấy chi tiết phòng thành công",
-                            Data = data
-                        });
-                    }
+						return Ok(new ApiResponse<clsLocationDetailModel>
+						{
+							Success = true,
+							Message = "Lấy chi tiết phòng thành công",
+							Data = data
+						});
+					}
 
 				default:
 					return BadRequest("Invalid action");
@@ -137,6 +134,32 @@ namespace HMS_NewProject_Temp_Humdity.Controllers
 						{
 							Success = true,
 							Message = "Tạo mới thành công",
+							Data = null
+						});
+					}
+				case DeviceActionType.UserConfig:
+					{
+
+						var dto = model.Info;
+						var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+						dto.UserId = userId;
+
+						if (dto == null)
+							return BadRequest("Invalid data");
+						if (!await _deviceService.ConfigDevice(dto))
+						{
+							return StatusCode(200, new ApiResponse<object>
+							{
+								Success = true,
+								Message = "thay đổi thành công",
+								Data = null
+							});
+						}
+
+						return StatusCode(400, new ApiResponse<object>
+						{
+							Success = false,
+							Message = "Không thay đổi",
 							Data = null
 						});
 					}

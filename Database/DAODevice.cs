@@ -1,9 +1,9 @@
 ﻿using System.Linq.Expressions;
-using HMS_NewProject_Temp_Humdity.Database.Interface;
-using HMS_NewProject_Temp_Humdity.Models;
+using HMS_Temp_Humdity_ApiManager.Database.Interface;
+using HMS_Temp_Humdity_ApiManager.Models;
 using MongoDB.Driver;
 
-namespace HMS_NewProject_Temp_Humdity.Database
+namespace HMS_Temp_Humdity_ApiManager.Database
 {
 	public class DAODevice : IDAODevice
 	{
@@ -31,15 +31,15 @@ namespace HMS_NewProject_Temp_Humdity.Database
 				var result = await _mongo.Find(filter).ToListAsync();
 				return result;
 			}
-			catch(Exception ex)
+			catch (Exception ex)
 			{
 				_logger.LogError(ex, "Error when get list device, detail: {Message}", ex.Message);
 				return new List<DeviceModel>();
 			}
 
-        }
+		}
 
-        public async Task<DeviceModel?> GetAsyncByImei(string imei)
+		public async Task<DeviceModel?> GetAsyncByImei(string imei)
 			=> await _mongo.Find(x => x.Imei == imei).FirstOrDefaultAsync();
 		public async Task CreateAsync(DeviceModel device)
 		{

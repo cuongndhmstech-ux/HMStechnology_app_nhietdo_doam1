@@ -1,4 +1,4 @@
-﻿namespace HMS_NewProject_Temp_Humdity.DTO
+﻿namespace HMS_Temp_Humdity_ApiManager.DTO
 {
 	public class ApiResponse<T>
 	{

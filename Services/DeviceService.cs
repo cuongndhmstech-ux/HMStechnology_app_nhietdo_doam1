@@ -1,11 +1,11 @@
-﻿using HMS_NewProject_Temp_Humdity.BaseException;
-using HMS_NewProject_Temp_Humdity.Database.Interface;
-using HMS_NewProject_Temp_Humdity.Models;
-using HMS_NewProject_Temp_Humdity.Services.Interface;
-using HMS_NewProject_Temp_Humdity.Signalr.Interface;
+﻿using HMS_Temp_Humdity_ApiManager.BaseException;
+using HMS_Temp_Humdity_ApiManager.Database.Interface;
+using HMS_Temp_Humdity_ApiManager.Models;
+using HMS_Temp_Humdity_ApiManager.Services.Interface;
+using HMS_Temp_Humdity_ApiManager.Signalr.Interface;
 using MongoDB.Driver;
 
-namespace HMS_NewProject_Temp_Humdity.Services
+namespace HMS_Temp_Humdity_ApiManager.Services
 {
 	public class DeviceService : IDeviceService
 	{
@@ -77,6 +77,7 @@ namespace HMS_NewProject_Temp_Humdity.Services
 
 			return result;
 		}
+
 		public async Task<List<LocationResponse>> GetDevicesByUserIdAsync(string userId)
 		{
 			try
@@ -112,7 +113,7 @@ namespace HMS_NewProject_Temp_Humdity.Services
 
 				return result;
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
 				return new List<LocationResponse>();
 			}
@@ -211,6 +212,38 @@ namespace HMS_NewProject_Temp_Humdity.Services
 			await _dAODevice.CreateAsync(device);
 		}
 
+		public async Task<bool> ConfigDevice(DeviceModel request)
+		{
+			if (!await _dAODevice.ExistsAsync(x => x.Imei == request.Imei && x.UserId == request.UserId))
+			{
+				throw new ResourceNotFoundException("thiết bị ko sở hữu");
+			}
+			// cập nhập từng trường
+			var updateDef = new List<UpdateDefinition<DeviceModel>>();
+			if (request.HumidityMin != null)
+				updateDef.Add(Builders<DeviceModel>.Update.Set(x => x.HumidityMin, request.HumidityMin));
+
+			if (request.HumidityMax != null)
+				updateDef.Add(Builders<DeviceModel>.Update.Set(x => x.HumidityMax, request.HumidityMax));
+
+			if (request.TemperatureMin != null)
+				updateDef.Add(Builders<DeviceModel>.Update.Set(x => x.TemperatureMin, request.TemperatureMin));
+
+			if (request.TemperatureMax != null)
+				updateDef.Add(Builders<DeviceModel>.Update.Set(x => x.TemperatureMax, request.TemperatureMax));
+
+			// Không có trường nào cần cập nhật
+			if (!updateDef.Any())
+				return false;
+
+
+			var combinedUpdate = Builders<DeviceModel>.Update.Combine(updateDef);
+			bool isSuccess = await _dAODevice.ModifyAsync(request.DeviceId, combinedUpdate);
+			// cái này xử lí redis bên process data
+			await _hubDevice.NotifyDeviceAddedAsync(request);
+			return isSuccess;
+		}
+
 		public async Task DeleteDevice(int deviceId)
 		{
 			//var device = await _dAODevice.GetByDeviceIdAsync(deviceId); // lấy trước khi xóa
@@ -225,7 +258,7 @@ namespace HMS_NewProject_Temp_Humdity.Services
 		{
 			//lấy thông tin phòng
 			var location = await _dAOLocation.GetAsync(x => x.LocationId == locationId && x.UserId == userId);
-			if(location == null) { throw new ResourceNotFoundException("Phòng không tồn tại"); }
+			if (location == null) { throw new ResourceNotFoundException("Phòng không tồn tại"); }
 			var allDevices = await _dAODevice.GetDeviceByUserIdAsync(userId);
 			var response = new clsLocationDetailModel
 			{

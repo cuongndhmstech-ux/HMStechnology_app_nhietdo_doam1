@@ -1,6 +1,6 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
 
-namespace HMS_NewProject_Temp_Humdity.Models
+namespace HMS_Temp_Humdity_ApiManager.Models
 {
 	public class CounterModel
 	{

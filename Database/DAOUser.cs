@@ -1,9 +1,9 @@
 ﻿using System.Linq.Expressions;
-using HMS_NewProject_Temp_Humdity.Database.Interface;
-using HMS_NewProject_Temp_Humdity.Models;
+using HMS_Temp_Humdity_ApiManager.Database.Interface;
+using HMS_Temp_Humdity_ApiManager.Models;
 using MongoDB.Driver;
 
-namespace HMS_NewProject_Temp_Humdity.Database
+namespace HMS_Temp_Humdity_ApiManager.Database
 {
 	public class DAOUser : IDAOUser
 	{

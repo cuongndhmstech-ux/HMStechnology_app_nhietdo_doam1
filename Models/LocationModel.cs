@@ -1,19 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using System.Text.Json;
 
-namespace HMS_NewProject_Temp_Humdity.Models
+namespace HMS_Temp_Humdity_ApiManager.Models
 {
 	public class LocationModel
 	{
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        [BindNever]
-        public string? Id { get; set; }
-        public string LocationId { get; set; } = null!;
+		[BsonId]
+		[BsonRepresentation(BsonType.ObjectId)]
+		[BindNever]
+		public string? Id { get; set; }
+		public string? LocationId { get; set; }
 
-		public string Name { get; set; } = null!;
+		public string? Name { get; set; }
 
 		// nếu là cá nhân thì UserId có giá trị
 		public string? UserId { get; set; }
@@ -21,17 +20,17 @@ namespace HMS_NewProject_Temp_Humdity.Models
 		// nếu là doanh nghiệp thì CompanyId có giá trị
 		public string? CompanyId { get; set; }
 
-		public DateTime CreatedAt { get; set; } = DateTime.Now;
+		public DateTime? CreatedAt { get; set; } = DateTime.Now;
 	}
-    public class LocationActionRequest
-    {
-        public UserActionType actionType { get; set; }
+	public class LocationActionRequest
+	{
+		public UserActionType actionType { get; set; }
 
-        public LocationModel Info { get; set; }
-    }
+		public LocationModel? Info { get; set; }
+	}
 
 
-    public class LocationResponse
+	public class LocationResponse
 	{
 		public required string LocationId { get; set; }
 		public string? UserId { get; set; }

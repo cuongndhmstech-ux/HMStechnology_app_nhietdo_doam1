@@ -1,6 +1,6 @@
-﻿using HMS_NewProject_Temp_Humdity.Models;
+﻿using HMS_Temp_Humdity_ApiManager.Models;
 
-namespace HMS_NewProject_Temp_Humdity.Services.Interface
+namespace HMS_Temp_Humdity_ApiManager.Services.Interface
 {
 	public interface ICompanyService
 	{

@@ -1,4 +1,4 @@
-﻿namespace HMS_NewProject_Temp_Humdity.BaseException
+﻿namespace HMS_Temp_Humdity_ApiManager.BaseException
 {
 	public class BadRequestException : Exception
 	{

@@ -1,10 +1,10 @@
-﻿using HMS_NewProject_Temp_Humdity.BaseException;
-using HMS_NewProject_Temp_Humdity.Database.Interface;
-using HMS_NewProject_Temp_Humdity.Models;
-using HMS_NewProject_Temp_Humdity.Services.Interface;
+﻿using HMS_Temp_Humdity_ApiManager.BaseException;
+using HMS_Temp_Humdity_ApiManager.Database.Interface;
+using HMS_Temp_Humdity_ApiManager.Models;
+using HMS_Temp_Humdity_ApiManager.Services.Interface;
 using MongoDB.Driver;
 
-namespace HMS_NewProject_Temp_Humdity.Services
+namespace HMS_Temp_Humdity_ApiManager.Services
 {
 	public class UserService : IUserService
 	{

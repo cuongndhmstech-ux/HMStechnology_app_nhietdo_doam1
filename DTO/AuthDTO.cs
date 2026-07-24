@@ -1,6 +1,6 @@
-﻿using HMS_NewProject_Temp_Humdity.Models;
+﻿using HMS_Temp_Humdity_ApiManager.Models;
 
-namespace HMS_NewProject_Temp_Humdity.DTO
+namespace HMS_Temp_Humdity_ApiManager.DTO
 {
 	public class AuthDTO
 	{

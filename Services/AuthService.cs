@@ -2,15 +2,15 @@
 using System.Security.Claims;
 using System.Text;
 using System.Text.RegularExpressions;
-using HMS_NewProject_Temp_Humdity.BaseException;
-using HMS_NewProject_Temp_Humdity.Database.Interface;
-using HMS_NewProject_Temp_Humdity.Models;
-using HMS_NewProject_Temp_Humdity.Services.Interface;
+using HMS_Temp_Humdity_ApiManager.BaseException;
+using HMS_Temp_Humdity_ApiManager.Database.Interface;
+using HMS_Temp_Humdity_ApiManager.Models;
+using HMS_Temp_Humdity_ApiManager.Services.Interface;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
-using static HMS_NewProject_Temp_Humdity.DTO.AuthDTO;
-using LoginRequest = HMS_NewProject_Temp_Humdity.DTO.AuthDTO.LoginRequest;
-namespace HMS_NewProject_Temp_Humdity.Services
+using static HMS_Temp_Humdity_ApiManager.DTO.AuthDTO;
+using LoginRequest = HMS_Temp_Humdity_ApiManager.DTO.AuthDTO.LoginRequest;
+namespace HMS_Temp_Humdity_ApiManager.Services
 {
 	public class AuthService : IAuthService
 	{

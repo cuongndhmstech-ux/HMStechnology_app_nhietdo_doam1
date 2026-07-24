@@ -1,12 +1,13 @@
 ﻿using System.Text;
-using HMS_NewProject_Temp_Humdity.Database;
-using HMS_NewProject_Temp_Humdity.Database.Interface;
-using HMS_NewProject_Temp_Humdity.Middleware;
-using HMS_NewProject_Temp_Humdity.Models.Config;
-using HMS_NewProject_Temp_Humdity.Services;
-using HMS_NewProject_Temp_Humdity.Services.Interface;
-using HMS_NewProject_Temp_Humdity.Signalr;
-using HMS_NewProject_Temp_Humdity.Signalr.Interface;
+using HMS_Temp_Humdity_ApiManager.BackGroundService;
+using HMS_Temp_Humdity_ApiManager.Database;
+using HMS_Temp_Humdity_ApiManager.Database.Interface;
+using HMS_Temp_Humdity_ApiManager.Middleware;
+using HMS_Temp_Humdity_ApiManager.Models.Config;
+using HMS_Temp_Humdity_ApiManager.Services;
+using HMS_Temp_Humdity_ApiManager.Services.Interface;
+using HMS_Temp_Humdity_ApiManager.Signalr;
+using HMS_Temp_Humdity_ApiManager.Signalr.Interface;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
@@ -50,8 +51,12 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IDeviceService, DeviceService>();
 builder.Services.AddScoped<ILocationService, LocationService>();
 
-builder.Services.AddSingleton<IHubDevice, HubDeviceMonitor>();
-var appConfig = builder.Configuration.Get<clsAppConfig>();
+builder.Services.AddSingleton<HubDeviceMonitor>();
+
+builder.Services.AddSingleton<IHubDevice>(sp =>
+	sp.GetRequiredService<HubDeviceMonitor>());
+
+builder.Services.AddHostedService<SignalRClientHostedService>(); var appConfig = builder.Configuration.Get<clsAppConfig>();
 builder.Services.AddSingleton(appConfig);
 
 builder.Services.AddControllers();

@@ -1,4 +1,4 @@
-﻿namespace HMS_NewProject_Temp_Humdity.Database.Interface
+﻿namespace HMS_Temp_Humdity_ApiManager.Database.Interface
 {
 	public interface IDAOCounter
 	{

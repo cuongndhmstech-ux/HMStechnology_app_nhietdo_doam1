@@ -1,11 +1,11 @@
-﻿using HMS_NewProject_Temp_Humdity.Models;
-using HMS_NewProject_Temp_Humdity.Models.Config;
-using HMS_NewProject_Temp_Humdity.Signalr.Interface;
+﻿using HMS_Temp_Humdity_ApiManager.Models;
+using HMS_Temp_Humdity_ApiManager.Models.Config;
+using HMS_Temp_Humdity_ApiManager.Signalr.Interface;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
 using Newtonsoft.Json;
 
-namespace HMS_NewProject_Temp_Humdity.Signalr
+namespace HMS_Temp_Humdity_ApiManager.Signalr
 {
 	public class HubDeviceMonitor : IHubDevice, IAsyncDisposable
 	{
@@ -47,28 +47,57 @@ namespace HMS_NewProject_Temp_Humdity.Signalr
 			};
 		}
 
-		private async Task EnsureConnected()
+		public async Task StartAsync(CancellationToken cancellationToken)
 		{
-			if (_connection.State == HubConnectionState.Connected)
-				return;
+			while (!cancellationToken.IsCancellationRequested)
+			{
+				try
+				{
+					if (_connection.State == HubConnectionState.Disconnected)
+					{
+						_logger.LogInformation("[Hub] Trying connect...");
 
-			await _connectLock.WaitAsync();
-			try
-			{
-				if (_connection.State == HubConnectionState.Disconnected)
-					await _connection.StartAsync();
-			}
-			finally
-			{
-				_connectLock.Release();
+						await _connection.StartAsync(cancellationToken);
+
+						_logger.LogInformation("[Hub] Connected.");
+					}
+				}
+				catch (Exception ex)
+				{
+					_logger.LogWarning(ex, "[Hub] Connect failed.");
+				}
+
+				await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken);
 			}
 		}
+		//private async Task EnsureConnected()
+		//{
+		//	if (_connection.State == HubConnectionState.Connected)
+		//		return;
+
+		//	await _connectLock.WaitAsync();
+
+		//	try
+		//	{
+		//		if (_connection.State == HubConnectionState.Disconnected)
+		//		{
+		//			_logger.LogInformation("[Hub] Connecting...");
+
+		//			await _connection.StartAsync();
+
+		//			_logger.LogInformation("[Hub] Connected.");
+		//		}
+		//	}
+		//	finally
+		//	{
+		//		_connectLock.Release();
+		//	}
+
 
 		private async Task SendAsync(string eventName, object payload, string logContext)
 		{
 			try
 			{
-				await EnsureConnected();
 				string json = JsonConvert.SerializeObject(payload);
 				await _connection.InvokeAsync("SendMessage", eventName, json);
 				_logger.LogInformation("[Hub] Gửi {EventName} thành công. {Context}", eventName, logContext);
@@ -78,7 +107,7 @@ namespace HMS_NewProject_Temp_Humdity.Signalr
 				_logger.LogError(ex, "[Hub] Gửi {EventName} thất bại. {Context}", eventName, logContext);
 			}
 		}
-
+		public HubConnectionState State => _connection.State;
 		// ================== DEVICE ==================
 		public async Task NotifyDeviceAddedAsync(DeviceModel deviceModel)
 			=> await SendAsync("DeviceCreated", deviceModel, $"IMEI={deviceModel.Imei}");

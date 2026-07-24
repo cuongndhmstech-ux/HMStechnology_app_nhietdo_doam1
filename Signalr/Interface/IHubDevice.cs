@@ -1,13 +1,20 @@
-﻿using HMS_NewProject_Temp_Humdity.Models;
+﻿using HMS_Temp_Humdity_ApiManager.Models;
+using Microsoft.AspNetCore.SignalR.Client;
 
-namespace HMS_NewProject_Temp_Humdity.Signalr.Interface
+namespace HMS_Temp_Humdity_ApiManager.Signalr.Interface
 {
 	public interface IHubDevice
 	{
-		Task NotifyLocationAddedAsync(LocationModel locationModel);
+		Task StartAsync(CancellationToken cancellationToken);
+		HubConnectionState State { get; }
+
+		// DEVICE
 		Task NotifyDeviceAddedAsync(DeviceModel deviceModel);
 		Task NotifyDeviceUpdatedAsync(DeviceModel deviceModel);
 		Task NotifyDeviceDeletedAsync(DeviceModel deviceModel);
+
+		// LOCATION
+		Task NotifyLocationAddedAsync(LocationModel locationModel);
 		Task NotifyLocationUpdatedAsync(LocationModel locationModel);
 		Task NotifyLocationDeletedAsync(LocationModel locationModel);
 

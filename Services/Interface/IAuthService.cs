@@ -1,7 +1,7 @@
-﻿using HMS_NewProject_Temp_Humdity.Models;
-using static HMS_NewProject_Temp_Humdity.DTO.AuthDTO;
+﻿using HMS_Temp_Humdity_ApiManager.Models;
+using static HMS_Temp_Humdity_ApiManager.DTO.AuthDTO;
 
-namespace HMS_NewProject_Temp_Humdity.Services.Interface
+namespace HMS_Temp_Humdity_ApiManager.Services.Interface
 {
 	public interface IAuthService
 	{

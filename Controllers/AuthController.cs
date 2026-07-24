@@ -1,9 +1,9 @@
 ﻿using System.Security.Claims;
-using HMS_NewProject_Temp_Humdity.DTO;
-using HMS_NewProject_Temp_Humdity.Services.Interface;
+using HMS_Temp_Humdity_ApiManager.DTO;
+using HMS_Temp_Humdity_ApiManager.Services.Interface;
 using Microsoft.AspNetCore.Mvc;
-using static HMS_NewProject_Temp_Humdity.DTO.AuthDTO;
-namespace HMS_NewProject_Temp_Humdity.Controllers
+using static HMS_Temp_Humdity_ApiManager.DTO.AuthDTO;
+namespace HMS_Temp_Humdity_ApiManager.Controllers
 {
 	[ApiController]
 	[Route("auth")]

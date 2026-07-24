@@ -1,8 +1,8 @@
 ﻿using System.Linq.Expressions;
-using HMS_NewProject_Temp_Humdity.Models;
+using HMS_Temp_Humdity_ApiManager.Models;
 using MongoDB.Driver;
 
-namespace HMS_NewProject_Temp_Humdity.Database.Interface
+namespace HMS_Temp_Humdity_ApiManager.Database.Interface
 {
 	public interface IDAODevice
 	{
@@ -22,5 +22,5 @@ namespace HMS_NewProject_Temp_Humdity.Database.Interface
 		//Task<List<DeviceModel>> GetDeviceStatusAsync(int Companyid, List<clsDeviceLastLogModel> deviceModels);
 		Task<List<DeviceModel>> GetDeviceByUserIdAsync(string userId);
 
-    }
+	}
 }
