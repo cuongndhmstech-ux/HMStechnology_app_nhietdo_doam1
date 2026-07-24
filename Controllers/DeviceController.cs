@@ -42,7 +42,7 @@ namespace HMS_Temp_Humdity_ApiManager.Controllers
 						return StatusCode(201, new ApiResponse<object>
 						{
 							Success = true,
-							Message = "Lấy dánh sách thành công ",
+							Message = "Lấy dánh sách thành công",
 							Data = await _deviceService.GetAllDeviceAndLocation()
 						});
 					}
